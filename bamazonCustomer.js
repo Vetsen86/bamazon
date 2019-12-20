@@ -37,7 +37,33 @@ function selectItemToBuy() {
         type: "number",
         message: "Please enter how many of this item you would like to purchase:"
     }]).then(function(response) {
-        console.log(response.ItemId + ", " + response.quantity);
-        connection.end();
+        checkQuantity(response.ItemId, response.quantity);
+    });
+}
+
+function checkQuantity(id, quantity) {
+    connection.query("SELECT * FROM products WHERE item_id=?", [id], function(err, res) {
+        if (err) throw err;
+        if (res[0].stock_quantity >= quantity) {
+            completeOrder(id, quantity, res[0].stock_quantity, res[0].price);
+        } else {
+            console.log("There is not enough stock to fulfill this order. The current inventory is: " +
+                res[0].stock_quantity + 
+                ". Please try again.");
+            selectItemToBuy();
+        }
+    });
+}
+
+function completeOrder(id, quantity, stock, price) {
+    var newQuantity = stock - quantity;
+    connection.query("UPDATE products SET ? WHERE item_id=?", 
+        [{ stock_quantity: newQuantity }, id], 
+        function(err, res) {
+            if (err) throw err;
+            var total = price * quantity;
+            console.log("Thank you for your order!");
+            console.log("Your total comes to: $" + total + ".");
+            connection.end();
     });
 }
