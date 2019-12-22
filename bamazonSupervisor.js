@@ -42,13 +42,36 @@ function viewProductSales() {
         "GROUP BY department_name";
     connection.query(query, function(err, res) {
         for (var i = 0; i < res.length; i++) {
-            console.log("Department ID: " + res[i].department_id + "\n");
-            console.log("Department Name: " + res[i].deparment_name + "\n");
-            console.log("Over Head Costs: " + res[i].over_head_costs + "\n");
-            console.log("Product Sales: " + res[i].product_sales + "\n");
-            console.log("Total Profit: " + res[i].total_profit + "\n");
+            console.log("Department ID: " + res[i].department_id);
+            console.log("Department Name: " + res[i].department_name);
+            console.log("Over Head Costs: " + res[i].over_head_costs);
+            console.log("Product Sales: " + res[i].product_sales);
+            console.log("Total Profit: " + res[i].total_profit);
             console.log("----------------------------------");
         }
-        connection.end();
+        showOptions();
+    });
+}
+
+function createDepartment() {
+    inquirer.prompt([{
+        name: "department",
+        type: "input",
+        message: "What would you like the new department to be named?"
+    }, {
+        name: "over_head",
+        type: "number",
+        message: "What are the over head costs for this department?"
+    }]).then(function(answer) {
+        connection.query("INSERT INTO departments SET ?",
+        {
+            department_name: answer.department,
+            over_head_costs: answer.over_head
+        },
+        function(err, res) {
+            if (err) throw err;
+            console.log("Department successfully created!");
+            showOptions();
+        });
     });
 }

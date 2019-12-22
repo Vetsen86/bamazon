@@ -123,7 +123,8 @@ function addProduct() {
             product_name: response.product,
             department_name: response.department,
             price: response.price,
-            stock_quantity: response.stock
+            stock_quantity: response.stock,
+            product_sales: 0
         }, 
         function(err, res) {
             if (err) throw err;
