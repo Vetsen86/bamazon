@@ -64,6 +64,23 @@ function completeOrder(id, quantity, stock, price) {
             var total = price * quantity;
             console.log("Thank you for your order!");
             console.log("Your total comes to: $" + total + ".");
-            connection.end();
+            getNewSales(id, total);
     });
+}
+
+function getNewSales(id, total) {
+    connection.query("SELECT product_sales FROM products WHERE item_id=?", [id], function(err, res) {
+        if (err) throw err;
+        var newSales = res[0].product_sales + total;
+        updateSales(id, newSales);
+    });
+}
+
+function updateSales(id, newSales) {
+    connection.query("UPDATE products SET ? WHERE item_id=?",
+        [{ product_sales: newSales }, id],
+        function(err, res) {
+            if(err) throw err;
+            connection.end();
+        });
 }
